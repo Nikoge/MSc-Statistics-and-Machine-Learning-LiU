@@ -6,16 +6,16 @@ Developed semi-supervised learning methods that classify cells according to sing
 
 # Courses:
 * Time Series Analysis
-Advanced Machine Learning
-Text Mining
-Decision Theory
-Database Technology
-Bayesian Learning
-Machine Learning
-Big Data Analytics
-Computational Statistics
-Advanced Data Mining
-Bioinformatics
-Advanced Programming in R
-Statistical Methods
-Introduction to Python
+* Advanced Machine Learning
+* Text Mining
+* Decision Theory
+* Database Technology
+* Bayesian Learning
+* Machine Learning
+* Big Data Analytics
+* Computational Statistics
+* Advanced Data Mining
+* Bioinformatics
+* Advanced Programming in R
+* Statistical Methods
+* Introduction to Python
