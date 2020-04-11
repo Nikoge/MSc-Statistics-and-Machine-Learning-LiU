@@ -1,0 +1,376 @@
+---
+title: "Time Series Analysis Lab B"
+author: "Thijs Quast (thiqu264)"
+date: "9/23/2019"
+output: pdf_document
+toc: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\newpage
+# Assignment 1. Computations with simulated data
+## a
+Generate 1000 observations from AR(3) process with phi1 = 0.8, phi2 = -0.2, phi3 = 0.1. Use these data and the definition of PACF to compute phi33 from the sample, i.e. write your own code that performs linear regressions on necessarily lagged variables and then computes an appropriate correlation. Compare the result with the output of function pacf() and with the theoretical value of
+phi33.
+
+$$ X_t = 0.8X_{t-1} - 0.2X_{t-2} + 0.1X_{t-3} + w_t$$ 
+$$ W_t distributed N(0,1)$$
+
+```{r}
+# pacf using linear regression
+set.seed(12345)
+data=arima.sim(list(ar=c(0.8,-0.2,0.1)), n=1000)
+data1=ts.intersect(x=data, x1=lag(data,-1), x2=lag(data,-2), x3=lag(data,-3), dframe = T)
+
+res1=lm(x~x1+x2,data=data1)
+res2=lm(x3~x2+x1,data=data1)
+r1=residuals(res1)
+r2=residuals(res2)
+cor(cbind(r1,r2))
+```
+
+```{r}
+# pacf function
+g=pacf(data)
+g$acf[3]
+```
+
+
+```{r}
+# Theoretical pacf
+theoretical_pacf <- ARMAacf(ar=c(0.8, -0.2, 0.1), lag.max = 30, pacf = TRUE)
+theoretical_pacf[3]
+```
+
+```{r}
+# Comparing in plots
+pacf(data, main="Sample PACF")
+plot(theoretical_pacf, xlab = "Lag", ylab = "Theoretical PACF", type = "h",
+     main = "Theoretical PACF")
+abline(h=0)
+```
+
+## b
+```{r}
+set.seed(12345)
+AR2 <- arima.sim(model = list(ar=c(0.8, 0.1)), n = 100)
+
+# Yule-Walker
+AR2_yw <- ar(x = AR2 ,method = "yw")
+
+# Conditional Least Squares
+AR2_cls <- arima(x = AR2, order = c(2,0,0), method = "CSS")
+
+# ML
+AR2_ML <- arima(x = AR2, order = c(2,0,0), method = "ML")
+```
+
+```{r}
+AR2_yw
+```
+
+```{r}
+AR2_cls
+```
+
+```{r}
+AR2_ML
+```
+
+
+```{r}
+# Theoretical value phi2
+
+```
+
+```{r}
+confint(AR2_ML)
+```
+
+
+## c
+```{r}
+omega <- c(0.3, rep(0, 11), 0.6)
+sAR <- arima.sim(model = list(order=c(0,0,13), ma=omega), n = 200)
+```
+
+```{r}
+# Sample ACF and Sample PACF
+acf(sAR, main="Sample ACF")
+pacf(sAR, main="Sample PACF")
+```
+
+## d
+```{r}
+library(astsa)
+x <- arima.sim(n = 200, list(order(0,0,13), ma=c(0.3, rep(0, 10), 0.6, 0.18)))
+fit <- sarima(xdata = AR2, 0, 0, 1, 0, 0, 1, 12)
+fit
+```
+
+```{r}
+sarima.for(xdata = sAR, 12, 0, 0, 1, 0, 0, 1, 12)
+```
+
+```{r}
+# Forecast, using kernlab package
+library(kernlab)
+x <- c(1:200)
+x_test <- c(0:230)
+fit_gausspr <- gausspr(x = x, y=sAR)
+
+# Add noise to predictions
+#noise <- rnorm(30)
+y_pred <- predict(fit_gausspr, x_test)
+
+```
+
+```{r}
+ts.plot(sAR)
+lines(y_pred, col="red")
+```
+
+## e
+```{r}
+set.seed(12345)
+ARMA_11 <- arima.sim(model = list(order=c(1,0,1), ar=0.7, ma=0.5), n = 50)
+ARMA_11_fit <- arima(x = ARMA_11[1:40], order = c(1,0,1))
+```
+
+```{r}
+prediction <- predict(ARMA_11_fit, n.ahead = 10)
+ts.plot(ts(ARMA_11[1:50]), prediction$pred, col=c(1:2), type="o")
+
+
+U = prediction$pred+2*prediction$se 
+L = prediction$pred-2*prediction$se
+xx = c(time(U), rev(time(U)));  yy = c(L, rev(U))
+polygon(xx, yy, border = 8, col = gray(.6, alpha = .2))
+lines(prediction$pred, type="p", col=2)
+```
+
+# Assignment 2
+## a
+```{r}
+# Chicken
+x_t <- chicken
+ts.plot(x_t)
+title(main = "Chicken")
+```
+
+```{r}
+# Chicken
+par(mfrow=c(2,2), oma=c(0,0,2,0))
+acf(x_t, lag.max = 40)
+pacf(x_t, lag.max = 40)
+acf(diff(x_t, lag = 1), lag.max = 40)
+pacf(diff(x_t, lag = 1), lag.max = 40)
+title(main = "ACF and PACF for Chicken", outer = TRUE)
+```
+
+Based on the fact that there is high ACF, but PACF seems to be low, in addition there seems to be seasonality for 12 lags. So, I'd say we go for an ARIMA(1,1,0)x(1,0,0)12
+
+## b
+```{r}
+#so2
+x_t <- so2
+ts.plot(x_t)
+title(main = "so2")
+```
+
+```{r}
+# so2
+par(mfrow=c(2,2), oma=c(0,0,2,0))
+acf(x_t)
+pacf(x_t)
+acf(diff(x_t, lag = 1))
+pacf(diff(x_t, lag = 1))
+title(main = "ACF and PACF for so2", outer = TRUE)
+```
+
+
+```{r}
+# EQCount
+x_t <- EQcount
+ts.plot(x_t)
+title(main = "EQcount")
+```
+
+
+```{r}
+# EQCount
+par(mfrow=c(2,2), oma=c(0,0,2,0))
+acf(x_t)
+pacf(x_t)
+acf(diff(x_t, lag = 1),lag.max=40)
+pacf(diff(x_t, lag = 1),lag.max=40)
+title(main = "ACF and PACF for EQcount", outer = TRUE)
+```
+
+```{r}
+x_t <- HCT
+ts.plot(x_t)
+title(main = "HCT")
+```
+
+```{r}
+# EQCount
+par(mfrow=c(2,2), oma=c(0,0,2,0))
+acf(x_t)
+pacf(x_t)
+acf(diff(x_t, lag = 1))
+pacf(diff(x_t, lag = 1))
+title(main = "ACF and PACF for HCT", outer = TRUE)
+```
+
+# Assignment 3
+## a
+```{r}
+ts.plot(oil)
+title(main = "Oil price time series")
+```
+
+```{r}
+# Non-stationary, so use differencing:
+ts.plot(diff(oil))
+```
+
+```{r}
+# Variance is not constant everywhere, so:
+ts.plot(diff(log(oil)))
+```
+Variance is much more equal now across the entire time series. Look at the y-scale of plot above.
+
+```{r}
+doil <- diff(log(oil))
+```
+
+```{r}
+library(tseries)
+```
+
+```{r}
+adf.test(doil)
+```
+
+```{r}
+acf2(doil)
+```
+
+```{r}
+library(TSA)
+eacf(doil)
+```
+
+```{r}
+# ARMA(1,1)
+fit1 <- sarima(doil, p = 1, d = 1, q = 1)
+hist(residuals(fit1$fit), breaks = 25)
+runs(residuals(fit1$fit))
+```
+
+```{r}
+# ARMA(0,3)
+fit2 <- sarima(doil, p = 0, d = 1, q = 3)
+hist(residuals(fit2$fit), breaks = 25)
+runs(residuals(fit2$fit))
+```
+
+```{r}
+logoil <- arima(log(oil), order = c(3,0,3))
+prediction <- predict(logoil, n.ahead=20)
+```
+
+
+```{r}
+ts.plot(oil, exp(prediction$pred), col=c(1:2))
+
+U <- exp(prediction$pred + 2*prediction$se)
+L <- exp(prediction$pred - 2*prediction$se)
+
+xx = c(time(U), rev(time(U)));  yy = c(L, rev(U))
+polygon(xx, yy, border = 8, col = gray(.6, alpha = .2))
+lines(prediction$pred, type="p", col=2)
+```
+
+## b
+```{r}
+ts.plot(unemp)
+title(main = "Unemployment Rates")
+```
+
+```{r}
+# Non-stationary, so use differencing:
+ts.plot(diff(unemp))
+```
+
+```{r}
+# Variance is not constant everywhere, so:
+ts.plot(diff(log(unemp)))
+```
+
+```{r}
+dunemp <- diff(log(unemp))
+```
+
+```{r}
+library(tseries)
+```
+
+```{r}
+adf.test(dunemp)
+```
+
+```{r}
+acf2(dunemp)
+```
+
+```{r}
+library(TSA)
+eacf(dunemp)
+```
+
+
+```{r}
+# ARMA(1,1)
+fit1 <- sarima(dunemp, p = 1, d = 1, q = 1)
+hist(residuals(fit1$fit), breaks = 25)
+runs(residuals(fit1$fit))
+```
+
+```{r}
+# ARMA(2,2)
+fit2 <- sarima(dunemp, p = 2, d = 1, q = 2)
+hist(residuals(fit2$fit), breaks = 25)
+runs(residuals(fit2$fit))
+```
+
+```{r}
+# ARMA (3,5)
+fit3 <- sarima(dunemp, p = 3, d = 1, q = 5)
+hist(residuals(fit3$fit), breaks = 25)
+runs(residuals(fit3$fit))
+```
+
+
+
+```{r}
+# ARMA (3,5)
+logunemp <- arima(log(unemp), order = c(3,0,5))
+prediction <- predict(logunemp, n.ahead=20)
+```
+
+
+```{r}
+ts.plot(unemp, exp(prediction$pred), col=c(1:2))
+
+U <- exp(prediction$pred + 2*prediction$se)
+L <- exp(prediction$pred - 2*prediction$se)
+
+xx = c(time(U), rev(time(U)));  yy = c(L, rev(U))
+polygon(xx, yy, border = 8, col = gray(.6, alpha = .2))
+lines(prediction$pred, type="p", col=2)
+```
