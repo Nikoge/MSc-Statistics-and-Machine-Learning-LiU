@@ -1,0 +1,227 @@
+---
+title: "Lab2_Thijs"
+author: "Thijs Quast (thiqu264)"
+date: "9/24/2019"
+output: pdf_document
+toc: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\newpage
+# Question 1
+```{r}
+library(HMM)
+
+# Parameter initialization, vectors
+states <- as.character(c(1:10))
+symbols <- as.character(c(1:10))
+startprobs <- rep((1/length(states)), length(states))
+
+# Parameter initialization, matrices
+
+# transprobs
+
+transprobs <- diag(x = 0.5, nrow = 10, ncol = 10)
+transprobs[1,2] <- 0.5
+transprobs[2,3] <- 0.5
+transprobs[3,4] <- 0.5
+transprobs[4,5] <- 0.5
+transprobs[5,6] <- 0.5
+transprobs[6,7] <- 0.5
+transprobs[7,8] <- 0.5
+transprobs[8,9] <- 0.5
+transprobs[9,10] <- 0.5
+transprobs[10,1] <- 0.5
+
+colnames(transprobs) <- as.character(c(1:10))
+rownames(transprobs) <- as.character(c(1:10))
+
+
+# emissionProbs
+emissionprobs <- matrix(data = 0, nrow = 10, ncol = 10)
+emissionprobs[1, c(1,2,3,9,10)] <- 0.2
+emissionprobs[2, c(1,2,3,4,10)] <- 0.2
+emissionprobs[3, c(1,2,3,4,5)] <- 0.2
+emissionprobs[4, c(2,3,4,5,6)] <- 0.2
+emissionprobs[5, c(3,4,5,6,7)] <- 0.2
+emissionprobs[6, c(4,5,6,7,8)] <- 0.2
+emissionprobs[7, c(5,6,7,8,9)] <- 0.2
+emissionprobs[8, c(6,7,8,9,10)] <- 0.2
+emissionprobs[9, c(7,8,9,10,1)] <- 0.2
+emissionprobs[10, c(8,9,10,1,2)] <- 0.2
+
+
+colnames(emissionprobs) <- as.character(c(1:10))
+rownames(emissionprobs) <- as.character(c(1:10))
+```
+
+```{r}
+# Init HMM
+HMM <- initHMM(States = states, Symbols = symbols, startProbs = startprobs, 
+               transProbs = transprobs,
+               emissionProbs = emissionprobs)
+```
+
+# Question 2
+```{r}
+simulation <- simHMM(HMM, length = 100)
+simulation
+```
+
+# Question 3
+
+```{r}
+# Generate alphas
+alphas <- exp(forward(hmm = HMM, observation = simulation$observation))
+
+# Generate betas
+betas <- exp(backward(hmm = HMM, observation = simulation$observation))
+```
+
+```{r}
+# Filtered probability distributions:
+filtered <- prop.table(alphas, margin = 2)
+
+# Check if filtered probabilities sum to 1:
+apply(filtered, 2, sum)
+```
+
+```{r}
+# Smoothed probability distributions:
+alphas_betas <- alphas*betas
+smoothed <- prop.table(alphas_betas, margin = 2)
+
+# Check if smoothed probabilites sum to 1:
+apply(smoothed, 2, sum)
+```
+
+
+```{r}
+# Most probably path:
+most_probable_path <- viterbi(hmm = HMM, observation = simulation$observation)
+```
+
+# Question 4
+```{r}
+# Guessed paths:
+guessed_filtered <- as.character(apply(filtered, MARGIN = 2, FUN=which.max))
+guessed_smoothed <- as.character(apply(smoothed, MARGIN = 2, FUN=which.max))
+```
+
+```{r}
+# Accuracy filtered:
+filterd_table <- table(guessed_filtered==simulation$states)
+accuracy_filtered <- filterd_table[2]/sum(filterd_table)
+```
+
+```{r}
+# Accuracy smoothed:
+smoothed_table <- table(guessed_smoothed == simulation$states)
+accuracy_smoothed <- smoothed_table[2]/sum(smoothed_table)
+```
+
+```{r}
+# Accuracy most probable path:
+probable_table <- table(most_probable_path == simulation$states)
+accuracy_probable <- probable_table[2]/sum(probable_table)
+```
+
+```{r}
+library(knitr)
+df <- as.data.frame(cbind(accuracy_filtered, accuracy_smoothed, accuracy_probable))
+colnames(df) <- c("Filtered", "Smoothed", "Probable")
+rownames(df) <- c("Accuracy")
+kable(df, caption = "Accuracy table")
+```
+
+# Question 5
+```{r}
+df2 <- as.data.frame(matrix(data = NA, nrow = 50, ncol = 3))
+colnames(df2) <- c("Filtered", "Smoothed", "Probable")
+```
+
+```{r}
+for (i in 1:50){
+  simulation <- simHMM(HMM, length = 100)
+  
+  # Generate alphas
+  alphas <- exp(forward(hmm = HMM, observation = simulation$observation))
+
+  # Generate betas
+  betas <- exp(backward(hmm = HMM, observation = simulation$observation))
+  
+  # Filtered probability distributions:
+  filtered <- prop.table(alphas, margin = 2)
+  
+  # Smoothed probability distributions:
+  alphas_betas <- alphas*betas
+  smoothed <- prop.table(alphas_betas, margin = 2)
+  
+  # Most probably path:
+  most_probable_path <- viterbi(hmm = HMM, observation = simulation$observation)
+  
+  # Guessed paths:
+  guessed_filtered <- as.character(apply(filtered, MARGIN = 2, FUN=which.max))
+  guessed_smoothed <- as.character(apply(smoothed, MARGIN = 2, FUN=which.max))
+  
+  # Accuracy filtered:
+  filterd_table <- table(guessed_filtered==simulation$states)
+  accuracy_filtered <- filterd_table[2]/sum(filterd_table)
+  
+  # Accuracy smoothed:
+  smoothed_table <- table(guessed_smoothed == simulation$states)
+  accuracy_smoothed <- smoothed_table[2]/sum(smoothed_table)
+  
+  # Accuracy most probable path:
+  probable_table <- table(most_probable_path == simulation$states)
+  accuracy_probable <- probable_table[2]/sum(probable_table)
+  
+  df2[i,] <- cbind(accuracy_filtered, accuracy_smoothed, accuracy_probable)
+}
+
+```
+
+```{r}
+df2$Sample <- c(1:50)
+```
+
+```{r}
+kable(df2, caption = "Accuracy table, 50 samples")
+```
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+df2 <- gather(df2, key = "Method", value = "Accuracy", -Sample)
+
+plot <- ggplot(df2, aes(Sample, Accuracy, col=Method)) + geom_line() + 
+  ggtitle("Prediction accuracy different methods")
+plot 
+```
+Smoothed probabilities show higher accuracies, probably this is due to the fact that according to the formula it uses all observations (0:T). Whilst, filtered only used 0:t. Viterbi algorithm (most probable path) has to deal with the constraint that it has to come up with a feasible paths. I.e. no unrealistic steps.
+
+# Question 6
+```{r}
+library(entropy)
+
+# Entropy is level of uncertainty, the higher the uncertainty, the more information
+entropy <- apply(filtered, MARGIN = 2, FUN = entropy.empirical)
+```
+
+```{r}
+plot(entropy, type = "l", main = "Entropy filtered probabilities", xlab = "Time")
+```
+
+No, the entropy plot shows fluctuations. So, also at later time points when the algorithm can use more information it is still not always certain.
+
+# Question 7
+```{r}
+time_101 <- filtered[,100] %*% transprobs
+time_101
+```
+Using the estimated predictions where the robot could be. From here on the robot moves one step further according to the transition matrix.

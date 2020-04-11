@@ -1,0 +1,265 @@
+---
+title: "Advanced Machine Learning - Lab1"
+output: pdf_document
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+author: Thijs Quast (thiqu264)
+toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\newpage
+# Assignment 1
+```{r}
+library(bnlearn)
+data("asia")
+```
+
+```{r}
+model1 <- hc(asia, start = NULL, restart = 100, score = "loglik")
+model2 <- hc(asia, start = NULL, restart = 50, score = "aic")
+model3 <- hc(asia, start = NULL, restart = 10, score = "bic")
+```
+
+```{r}
+par(mfrow=c(1,3), oma=c(0,0,2,0))
+plot(model1, main="BN Model1")
+plot(model2, main="BN Model2")
+plot(model3, main="BN Model3")
+title(main="Different BN Models", outer = T)
+```
+
+```{r}
+arcs(model1)
+arcs(model2)
+arcs(model3)
+```
+
+```{r}
+vstructs(model1)
+vstructs(model2)
+vstructs(model3)
+```
+
+```{r}
+all.equal(model1, model2, model3)
+```
+
+As can be seen above, multiple runs of the hill-climbing algorithm, with e.g. different score settings result in different Bayesian Networks. Firstly this can seen from the plotted graphs, also the arcs are different. In addition, when I use the all.equal function in R, it returns that the models are different and how they are different: "Different number of directed/undirected arcs".
+
+Probably, different starting points of the algorithm with respect to the order of letters return different Bayesian Networks.
+
+# Assignment 2
+
+```{r}
+library(RBGL)
+library(gRain)
+```
+
+```{r}
+#train and test split, learned in Machine Learning course
+n <- dim(asia)[1]
+set.seed(12345)
+id <- sample(1:n, floor(n*0.8))
+train <- asia[id,]
+
+id1 <- setdiff(1:n, id)
+set.seed(12345)
+id2 <- sample(id1, floor(n*0.2))
+test <- asia[id2,]
+```
+
+```{r}
+# Use exact inference
+# Create structure
+structure <- hc(train)
+fit <- bn.fit(x = structure, data = train)
+fit_grain <- as.grain(fit)
+```
+
+```{r}
+plot(structure)
+```
+
+
+```{r}
+compiled_grain <- compile(fit_grain)
+```
+
+```{r}
+# Manipulating data
+# The function querygrain needs the data to be in character form
+test2 <- test
+test <- apply(test, 2, as.character)
+```
+
+```{r}
+predictions <- c()
+
+for (i in 1:nrow(test)){
+  evidence <- setFinding(object = compiled_grain,
+                                 nodes = c("A", "T", "L", "B", "E", "X", "D"),
+                                 states = test[i, -2])
+  
+  posterior <- unlist(querygrain(object = evidence, nodes="S"))
+  
+  if (posterior[1] > 0.5) {
+    predictions[i] <- "No"
+  } else {
+    predictions[i] <- "Yes"
+  }
+  
+}
+```
+
+```{r}
+confusion_matrix <- table(test2$S, predictions)
+confusion_matrix
+```
+
+```{r}
+# True Bayesian Network
+dag <- model2network("[A][S][T|A][L|S][B|S][D|B:E][E|T:L][X|E]")
+fit_true <- bn.fit(x = dag, data = train)
+fit_true <- as.grain(fit_true)
+plot(dag)
+```
+```{r}
+compile_true <- compile(fit_true)
+```
+
+```{r}
+predictions_true <- c()
+
+for (i in 1:nrow(test)){
+  evidence <- setFinding(object = compile_true,
+                                 nodes = c("A", "T", "L", "B", "E", "X", "D"),
+                                 states = test[i, -2])
+  
+  posterior <- unlist(querygrain(object = evidence, nodes="S"))
+  
+  if (posterior[1] > 0.5) {
+    predictions_true[i] <- "No"
+  } else {
+    predictions_true[i] <- "Yes"
+  }
+  
+}
+```
+
+```{r}
+confusion_true <- table(test2$S, predictions_true)
+confusion_true
+
+error_true <- (confusion_true[1,2] + confusion_true[2,1])/(sum(confusion_true))
+error_true
+```
+
+
+# Assignment 3
+```{r}
+markov_blanket <- mb(x = fit, node = "S")
+markov_blanket
+```
+
+```{r}
+predictions_mb <- c()
+
+for (i in 1:nrow(test)){
+  evidence <- setFinding(object = compiled_grain,
+                                 nodes = markov_blanket,
+                                 states = test[i, markov_blanket])
+  
+  posterior <- unlist(querygrain(object = evidence, nodes="S"))
+  
+  if (posterior[1] > 0.5) {
+    predictions_mb[i] <- "No"
+  } else {
+    predictions_mb[i] <- "Yes"
+  }
+  
+}
+```
+
+```{r}
+confusion_matrix_mb <- table(test2$S, predictions_mb)
+confusion_matrix_mb
+```
+
+# Assignment 4
+
+```{r}
+# Naive Bayes:
+naive_bayes = model2network("[S][A|S][T|S][L|S][B|S][E|S][X|S][D|S]")
+plot(naive_bayes)
+```
+
+
+```{r}
+naive_bayes <- bn.fit(x = naive_bayes, data = train)
+naive_bayes <- as.grain(naive_bayes)
+naive_bayes <- compile(naive_bayes)
+```
+
+
+```{r}
+naive_predictions <- c()
+
+for (i in 1:nrow(test)){
+  evidence <- setFinding(object = naive_bayes,
+                                 nodes = c("A", "T", "L", "B", "E", "X", "D"),
+                                 states = test[i, -2])
+  
+  posterior <- unlist(querygrain(object = evidence, nodes="S"))
+  
+  if (posterior[1] > 0.5) {
+    naive_predictions[i] <- "No"
+  } else {
+    naive_predictions[i] <- "Yes"
+  }
+  
+}
+```
+
+```{r}
+confusion_naive_bayes <- table(test2$S, naive_predictions)
+confusion_naive_bayes
+```
+
+
+# Assignment 5
+```{r}
+# Trained model (Assignment 2)
+confusion_matrix
+error <- (confusion_matrix[1,2] + confusion_matrix[2,1])/(sum(confusion_matrix))
+error
+```
+
+```{r}
+# True model (Assignment 2)
+confusion_true
+error_true
+```
+
+
+```{r}
+# Markov blanket (Assignment 3)
+confusion_matrix_mb
+error_mb <- (confusion_matrix_mb[1,2] + confusion_matrix_mb[2,1])/(sum(confusion_matrix_mb))
+error_mb
+```
+
+```{r}
+# Naive bayes (Assignment 4)
+confusion_naive_bayes
+
+error_naive_bayes <- (confusion_naive_bayes[1,2] +   confusion_naive_bayes[2,1])/(sum(confusion_naive_bayes))
+
+error_naive_bayes
+```
+
+The models from questions 2 and 3 return exactly the same results. Probably, conditioning on the Markov Blanket is already sufficient to construct the model. Therefore more elaborate models are not better in performance.
+
+The fact that the Naive Bayes classifier performs worse than the other models is because in this model we assume independence amongst all explanatory variables. In practice this is very unlikely, therefore it is logical that the Naive Bayes classifier performs worse than the other models.
