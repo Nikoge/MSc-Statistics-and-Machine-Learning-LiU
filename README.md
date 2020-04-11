@@ -1,4 +1,5 @@
-# MSc-Statistics-and-Machine-Learning-LiU
+# MSc Statistics and Machine Learning
+# Linköping University
 Overview of my work during the MSc Statistics and Machine Learning at Linköping University 2018-2020
 
 ### MSc thesis: semi-supervised learning for cell type identification
