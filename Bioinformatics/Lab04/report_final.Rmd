@@ -1,0 +1,381 @@
+---
+title: "Lab 04 - Bioinformatics"
+author: "Thijs Quast (thiqu264), Lennart Schilling (lensc874), Mariano Maquieira Mariani (marma330)"
+date: "12-12-2018"
+output: pdf_document
+toc: TRUE
+---
+
+\newpage
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Question 1
+
+Using the *getGEOSuppFiles*-function of the *GEOquery*-package, the data for the series *GSE20986* will be downloaded. 
+The data includes twelve different samples of human umbilical vein endothelial cells (HUVEC), human iris, retinal and choroidal cells. 
+RNA extracts of cells were hybridised to *Affymetrix HGU133plus2* which represents the complete coverage of the *Human Genome U133 Set* plus 6,500 additional genes for analysis of over 47,000 transcripts.
+
+In the first step, the data (series *GSE20986* will be downloaded from the website of the *National Center for 
+Biotechnology Information* using the *GEOquery*-package. Afterwards, the data will be transformed to the correct format. Doing so, it will be untarred and gunzipped.
+```{r, message=FALSE}
+library(GEOquery)
+x = getGEOSuppFiles("GSE20986")
+untar("GSE20986/GSE20986_RAW.tar", exdir = "data")
+cels = list.files("data/", pattern = "[gz]")
+sapply(paste("data", cels, sep = "/"), gunzip)
+```
+
+After unpacking, a data.frame with the different samples (including target of each sample) will be created and 
+saved as a txt.file. This file be used within the *read.affy*-function as an input parameter to read the unzipped files.
+```{r}
+phenodata = matrix(rep(list.files("data"), 2), ncol =2)
+phenodata <- as.data.frame(phenodata)
+colnames(phenodata) <- c("Name", "FileName")
+phenodata$Targets <- c("iris", 
+                       "retina", 
+                       "retina", 
+                       "iris", 
+                       "retina", 
+                       "iris", 
+                       "choroid", 
+                       "choroid", 
+                       "choroid", 
+                       "huvec", 
+                       "huvec", 
+                       "huvec")
+write.table(phenodata, "data/phenodata.txt", quote = F, sep = "\t", row.names = F)
+knitr::kable(phenodata)
+```
+
+The downloaded and prepared data will be read. The created .txt-file will be integrated in the returned *AffyBatch*-object.
+```{r, message=FALSE}
+library(simpleaffy)
+celfiles <- read.affy(covdesc = "phenodata.txt", path = "data")
+```
+
+Boxplots for each sample will be created:
+```{r}
+suppressWarnings(boxplot(celfiles))
+```
+
+Each boxplot represents the distribution of each sample related to how well the RNAs fit to the delivered genes of the *Affymetrix Human Genome U133 Plus 2.0 Array*.
+
+In the next step, the samples will be coloured differently.
+```{r, message=FALSE}
+library(RColorBrewer)
+cols = brewer.pal(8, "Set1")
+boxplot(celfiles, col = cols, las = 2)
+```
+
+The resulting boxplot is characterized by the same boxes as before. The colouring lead to fill the in total twelve 
+boxes/samples with eight different colours. For us, this process does not deliver any bigger insights.
+
+The data of each sample will be extracted. The samples will be named using the specified targets. As a result,
+a data frame with twelve columns and 1354896 rows will be extracted. 
+```{r}
+samples <- celfiles$Targets
+eset <- exprs(celfiles)
+colnames(eset) <- samples
+```
+
+Having a look at the first six rows of the extracted data, each column represents one sample. 
+Each row value shows, how strong the RNA of the sample binded to the specific DNA spot. A low value indicates
+that a sample did not bind with a high intensity to the DNA spot. The higher the value the more binding intensity could be identified.
+```{r}
+head(eset)
+```
+
+Using these values, euclidian distances between the samples can be calculated. With these distance results, hierarchical clustering can be performed. This gives a visual overview about how similar or non-similar the different samples are.
+```{r}
+distance <- dist(t(eset), method = "maximum")
+clusters <- hclust(distance)
+plot(clusters)
+```
+
+It can be seen that on the on hand samples of *huvec* and *retina* and on the other hand samples of *iris* and *choroid* are clustered together.
+A point which has to be mentioned is that for *huvec* and *retina*, two different clusters can be found. 
+
+So far, the data was not normalized yet.
+The *affyPLM*-package can be used to correct the optical noise and non-specific binding.
+```{r, message=FALSE}
+library(affyPLM)
+celfiles.gcrma = gcrma(celfiles)
+```
+
+Comparing the results of the boxplots before and after the nomalization, bigger differences can be seen:
+```{r}
+par(mfrow=c(1,2))
+boxplot(celfiles.gcrma, col = cols, las = 2, main = "Post-Normalization");
+boxplot(celfiles, col = cols, las = 2, main = "Pre-Normalization")
+dev.off()
+```
+
+The microarray data for the samples seem to be much more similar distributed after the normalization.
+
+The calculation of the distances between the normalized samples lead to the following hierarchical clustering:
+```{r}
+distance <- dist(t(exprs(celfiles.gcrma)), method = "maximum")
+clusters <- hclust(distance)
+plot(clusters)
+```
+
+Within this plot, the different sample names were not adjusted before. That is why it is hard to tell if the clustering changed related to the previous clustering (not normalized).
+Manually, we adjust the samples names and repeat the clustering.
+```{r}
+esetNormalized = exprs(celfiles.gcrma)
+colnames(esetNormalized) = celfiles$Targets
+clusters = hclust(dist(t(esetNormalized), method = "maximum"))
+plot(clusters)
+```
+
+As a result, it leads to the result that all *huvec*-samples are clutered together - separated from the other eye cells.
+
+In the following step, a design matrix will be created using the different specified sample names (*iris*, *retina*, *choroid* and *huvec*).
+The result is a matrix consisting of the four dummy variables and the twelve samples as rows. The first row for example has a value of 1 within the *iris*-variable and 0 elsewhere.
+Thus, this row represents an *iris*-sample
+```{r}
+samples <- as.factor(samples)
+design <- model.matrix(~0+samples)
+colnames(design) <- c("choroid", "huvec", "iris", "retina")
+knitr::kable(design)
+```
+
+The first row for example has a value of 1 within the *iris*-variable and 0 elsewhere.
+Thus, this row represents an *iris*-sample
+
+Using the created design matrix, a contrast matrix will be also constructed calculating the contrasts between the *huvec*-samples and the other three sample types.
+```{r, message=FALSE}
+library(limma)
+contrast.matrix = makeContrasts(
+  huvec_choroid = huvec - choroid, 
+  huvec_retina = huvec - retina, 
+  huvec_iris = huvec - iris, 
+  levels = design)
+```
+
+Both design matrix and contrast matrix will be used to fit a linear model to the normalized data.
+```{r}
+fit = lmFit(celfiles.gcrma, design)
+huvec_fit <- contrasts.fit(fit, contrast.matrix)
+huvec_ebay <- eBayes(huvec_fit)
+```
+
+Within the next steps, a plot will created to explain the differences between the *huvec*-samples and the other samples visually. A gene will be classified as upregulated or downregulated only if the adjusted p-value is lower than 0.5. Then, these genes are more (upregulated) or less (downregulated) included within the *huvec*-samples compared to the other samples. 
+```{r, message=FALSE}
+library(hgu133plus2.db)
+library(annotate)
+probenames.list <- rownames(topTable(huvec_ebay, number = 100000))
+getsymbols <- getSYMBOL(probenames.list, "hgu133plus2")
+results <- topTable(huvec_ebay, number = 100000, coef = "huvec_choroid")
+results <- cbind(results, getsymbols)
+summary(results)
+
+results$threshold <- "1"
+a <- subset(results, adj.P.Val < 0.05 & logFC > 5)
+results[rownames(a), "threshold"] <- "2"
+b <- subset(results, adj.P.Val < 0.05 & logFC < -5)
+results[rownames(b), "threshold"] <- "3"
+table(results$threshold)
+
+library(ggplot2)
+volcano <- ggplot(data = results, 
+                  aes(x = logFC, y = -1*log10(adj.P.Val), 
+                      colour = threshold, 
+                      label = getsymbols))
+
+volcano <- volcano + 
+  geom_point() + 
+  scale_color_manual(values = c("black", "red", "green"), 
+                     labels = c("Not Significant", "Upregulated", "Downregulated"), 
+                     name = "Key/Legend")
+
+volcano + 
+  geom_text(data = subset(results, logFC > 5 & -1*log10(adj.P.Val) > 5), aes(x = logFC, y = -1*log10(adj.P.Val), colour = threshold, label = getsymbols)  )
+```
+
+
+# Question 3
+
+huvec_choroid
+```{r, echo=FALSE, out.width = "250px"}
+knitr::include_graphics("huvec_choroid.jpeg")
+```
+
+huvec_retina
+```{r, echo=FALSE, out.width = "250px"}
+knitr::include_graphics("huvec_retina.jpeg")
+
+```
+
+huvec_iris
+```{r, echo=FALSE, out.width = "250px"}
+knitr::include_graphics("huvec_iris.jpeg")
+```
+
+Resulting from three vulcano plots, if certain genes occur more frequently in "Iris", "Retina" and "Choroid", these will appear as red dots. In the plot these are mentioned as significantly upregluated. To be able to arrive at this conclusion a model is fit. If signifiantly more genes occur in one sample they will come up as a red dot in the plots.
+
+For each respective pair the following genes are considered to be significantly differentially expressed.
+
+Huvec-Choroid: "HOXB7", "IL1RL1", "HOXA5", "HOXB6", "GABBR2", "SOCS2", "CCNK"
+
+
+Huvec-Retina: "HOXB7", "IL1RL1", "HOXA5", "SERPIND1", "GABBR2", "DHH", "GBGT1"
+
+
+Huvec-Iris: "HOXB7", "IL1RL1", "HOXA5", "HOXB6", "RASGRF2", "SOCS2"
+
+
+# Question 4
+
+### HOXB7
+Official name: homeobox B7
+
+This gene is from the Antp homeobox family. It is part of a cluster of homeobox B genes which can be found in  chromosome 17. If this gene is frequently present in can indicate presence of melanoma or ovarian carcinoma.
+
+Gene Ontology (GC) terms:
+```{r, echo=FALSE, eval=TRUE}
+knitr::kable(as.data.frame(cbind(GO_ID = c("GO:0000978", "GO:0000981", "GO:0001077", "GO:0003677", "GO:0003700"),
+      Qualified_GO_Term = c("RNA polymerase II proximal promoter sequence-specific DNA binding",
+                            "RNA polymerase II transcription factor activity, sequence-specific DNA binding",
+                            "transcriptional activator activity, RNA polymerase II proximal promoter sequence-specific DNA binding",
+                            "DNA binding",
+                            "DNA binding transcription factor activity	"))))
+```
+
+### IL1RL1
+Official name: interleukin 1 receptor like 1
+
+The protein encoded by this gene is a part of the interleukin 1 family. The same gene has been studied in mouses and research suggested that it can be induced by proinflammatory stimuli, and may be important for the function of T cells. 
+
+Gene Ontology (GC) terms:
+```{r, echo=FALSE, eval=TRUE}
+knitr::kable(as.data.frame(cbind(GO_ID = c("GO:0002826", "GO:0006955", "GO:0007165", "GO:0019221", "GO:0032689"),
+      Qualified_GO_Term = c("negative regulation of T-helper 1 type immune response",
+                            "immune response",
+                            "signal transduction",
+                            "cytokine-mediated signaling pathway",
+                            "negative regulation of interferon-gamma production"))))
+```
+
+### HOXA5
+Official name: homeobox A5
+
+Proteins encoded from this gene are temporally regulated during embryonic development. Methylation of this gene can led to the loss of how frequently it is expressed. Because the encoded protein upregulates the tumor suppressor p53, this protein can fulfill an important role in tumorigenesis. 
+
+Gene Ontology (GC) terms:
+```{r, echo=FALSE, eval=TRUE}
+knitr::kable(as.data.frame(cbind(GO_ID = c("GO:0000978", "GO:0000981", "GO:0001077", "GO:0003677", "GO:0003700"),
+      Qualified_GO_Term = c("RNA polymerase II proximal promoter sequence-specific DNA binding	IDA	10879542",
+                            "RNA polymerase II transcription factor activity, sequence-specific DNA binding	NAS	19274049",
+                            "transcriptional activator activity, RNA polymerase II proximal promoter sequence-specific DNA binding	IDA	10879542",
+                            "DNA binding	IDA	8657138",
+                            "DNA binding transcription factor activity"))))
+```
+
+### HOXB6
+Official name: homeobox B6
+
+The HOXB6 gene e is part of Antp homeobox family. The protein that is encoded from this gene is involved in the development of lungs and skin.
+
+Gene Ontology (GC) terms:
+```{r, echo=FALSE, eval=TRUE}
+knitr::kable(as.data.frame(cbind(GO_ID = c("GO:0005634"),
+      Qualified_GO_Term = c("nucleus"
+                            ))))
+```
+
+### GABBR2
+Official name: gamma-aminobutyric acid type B receptor subunit 2
+
+The protein encoded from this gene is part of the G-protein coupled receptor 3 family and GABA-B receptor subfamily. The receptors influence the release of neurotransmitters. 
+
+Gene Ontology (GC) terms:
+```{r, echo=FALSE, eval=TRUE}
+knitr::kable(as.data.frame(cbind(GO_ID = c("GO:0004930", "GO:0004965", "GO:0005515", "GO:0046982"),
+      Qualified_GO_Term = c("G-protein coupled receptor activity",
+                            "contributes_to G-protein coupled GABA receptor activity",
+                            "protein binding",
+                            "protein heterodimerization activity"))))
+```
+
+
+### SOCS2
+Official name: suppressor of cytokine signaling 2
+
+The protein that his gene encodes by this gene is involved in the insulin-like growth factor-1 receptor (IGF1R).
+
+Gene Ontology (GC) terms:
+```{r, echo=FALSE, eval=TRUE}
+knitr::kable(as.data.frame(cbind(GO_ID = c("GO:0004860", "GO:0005070", "GO:0005131", "GO:0005159", "GO:0005515"),
+      Qualified_GO_Term = c("protein kinase inhibitor activity",
+                            "SH3/SH2 adaptor activity",
+                            "growth hormone receptor binding",
+                            "insulin-like growth factor receptor binding",
+                            "protein binding"))))
+```
+
+
+### CCNK
+Offical name: cyclin K
+
+This gene encodes a protein that is part of the transcription cyclin family. This gene fulfills two roles in regulating CDK and RNA polymerase II activities.
+
+Gene Ontology (GC) terms:
+```{r, echo=FALSE, eval=TRUE}
+knitr::kable(as.data.frame(cbind(GO_ID = c("GO:0004674", "GO:0004693", "GO:0005515", "GO:0008353", "GO:0016538"),
+      Qualified_GO_Term = c("protein serine/threonine kinase activity",
+                            "cyclin-dependent protein serine/threonine kinase activity",
+                            "protein binding",
+                            "RNA polymerase II carboxy-terminal domain kinase activity",
+                            "cyclin-dependent protein serine/threonine kinase regulator activity"))))
+```
+
+
+### SERPIND1
+Official name: serpin family D member 1
+
+This gene is part of the serpin gene superfamily. Serpins are important during inflammation, blood clotting, and cancer metastasis.
+
+Gene Ontology (GC) terms:
+```{r, echo=FALSE, eval=TRUE}
+knitr::kable(as.data.frame(cbind(GO_ID = c("GO:0004866", "GO:0004867", "GO:0008201", "GO:0030414"),
+      Qualified_GO_Term = c("endopeptidase inhibitor activity",
+                            "serine-type endopeptidase inhibitor activity",
+                            "heparin binding",
+                            "peptidase inhibitor activity"))))
+```
+
+
+### DHH
+Official name: desert hedgehog signaling molecule
+
+This gene belongs to the hedgehog family. These genes are important during morphogenesis.
+
+Gene Ontology (GC) terms:
+```{r, echo=FALSE, eval=TRUE}
+knitr::kable(as.data.frame(cbind(GO_ID = c("GO:0005113", "GO:0005509", "GO:0005515", "GO:0008233", "GO:0008270"),
+      Qualified_GO_Term = c("patched binding",
+                            "calcium ion binding",
+                            "protein binding",
+                            "peptidase activity",
+                            "zinc ion binding"))))
+```
+
+
+### GBGT1
+Official name: globoside alpha-1,3-N-acetylgalactosaminyltransferase 1
+
+This gene encodes a glycosyltransferase which is important during the synthesis of Forssman glycolipid. Great expressions of this gene can create host tropism to microorganisms.
+
+Gene Ontology (GC) terms:
+
+
+### RASGRF2
+Official name: Ras protein specific guanine nucleotide releasing factor 2
+
+The RASGRF2 gene encodes a nucleotide which which activates RAS and RAS related proteins.
+
+
+

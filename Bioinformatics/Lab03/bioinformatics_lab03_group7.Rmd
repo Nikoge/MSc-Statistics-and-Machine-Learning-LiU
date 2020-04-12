@@ -1,0 +1,328 @@
+---
+title: "Bioinformatics - Computer Lab 3"
+author: "Group 7: Lennart Schilling (lensc874), Thijs Quast (thiqu264), Mariano Maquieira Mariani (marma330)"
+date: "06-12-2018"
+output: pdf_document
+---
+# Question 1
+
+Answer
+Using the script http://ape-package.ird.fr/APER/APER2/SylviaWarblers.R we obtained the Sylvia warblers phylogeny: the file sylvia_nj_k80.tre is in this folder.
+```{r}
+library(ape)
+```
+
+## Question 1.1
+Explain all the steps in the script required to obtain the phylogeny and trait data.
+We willget the sequence data from GenBank and align them, and read the ecological data from a file
+to obtain the phylogeny:
+
+1- We create a vector starting with Z73494, and then the values AJ5345, appending 26,27,28,etc...
+```{r} 
+x <- paste("AJ5345", 26:49, sep = "")
+x <- c("Z73494", x)
+```
+We connect to the GenBank database, and get sequences using accession numbers given as arguments (As a result we get an object of type DNAbin. (the object will have 25 dna sequences stored)
+```{r}
+sylvia.seq <- read.GenBank(x)
+```
+We have a list with 25 sequences.
+23 of them have 1143 nucleotides, and 2 have 1041. (It needs an alignment operation which is done with Clustal).
+
+3- We use 'clustal'  which aligns a set of nucleotide sequences. (We also aligned using mafft and the result was identical).
+```{r}
+sylvia.clus <- clustal(sylvia.seq)
+```
+
+4-We save in taxa.sylvia the names of all the species
+```{r}
+taxa.sylvia <- attr(sylvia.seq, "species")
+names(taxa.sylvia) <- names(sylvia.seq)
+taxa.sylvia[1] <- "Sylvia_atricapilla"
+taxa.sylvia[24] <- "Sylvia_abyssinica"
+```
+
+5- We create a function that reroots a phylogenetic tree with 'AJ534526' as the outgroup
+```{r}
+f <- function(xx) root(nj(dist.dna(xx, p=TRUE)), "AJ534526")
+```
+
+6- We reroot using our aligned sequence
+```{r}
+tr <- f(sylvia.clus)
+nj.est <- tr
+```
+
+
+7- We relabel from the 'criptic' names to the useful species names.
+```{r}
+nj.est$tip.label <- taxa.sylvia[tr$tip.label]
+write.tree(nj.est, "sylvia_nj_k80.tre")
+plot(nj.est)
+```
+
+Finally we get the trait data from http://ape-package.ird.fr/APER/APER2/sylvia_data.txt
+```{r}
+sylvia.eco <- read.table("sylvia_data.txt")
+```
+We drop the outgroup species (Chamaea fasciata) for which we have no ecological data:
+```{r}
+nj.est <- drop.tip(nj.est, "Chamaea_fasciata")
+```
+
+## Question 1.2
+Sorting the data so its rows are in the same order as the tip labels of the tree
+```{r}
+DF <- sylvia.eco[nj.est$tip.label, ]
+```
+
+Evolution: migration is realted to geographical range:
+```{r}
+table(DF$geo.range, DF$mig.behav)
+```
+
+
+Consider different models (parameter model). Report on the results and interpret the estimated rates and their standard errors.
+Analyze the discrete (type=discrete) geographical range variable (DF$geo.range)
+```{r}
+syl.er <- ace(DF$geo.range, nj.est, type = "d")
+syl.er
+```
+
+symmetrical model:  transition rates will change  from state to state. But transitions between two given states have equal rates in both directions
+```{r}
+syl.sym <- ace(DF$geo.range, nj.est, type="d", model="SYM")
+syl.sym
+```
+The symmetrical model is the best one. 
+
+We compare likelihood:
+```{r}
+anova(syl.er, syl.sym)
+```
+model:  only the transitions temp to temptrop to trop.
+We create a matrix mod
+```{r}
+mod <- matrix(0, 3, 3)
+mod[2, 1] <- mod[1, 2] <- 1
+mod[2, 3] <- mod[3, 2] <- 2
+
+syl.mod <- ace(DF$geo.range, nj.est, type="d", model=mod)
+syl.mod
+```
+
+
+we compare them using their AIC values:
+```{r}
+sapply(list(syl.er, syl.sym, syl.mod), AIC)
+```
+custom model has the smallest AIC.
+
+
+
+
+
+
+
+
+
+
+
+# Question 2
+
+Within this assignment, we are working with different libraries we have to load and attach. Since the *carni70* data set will be used to fit the five phylogenetic comparative models in 2.2, it will be also read into the R environment.
+```{r, echo=TRUE, eval=TRUE, message=FALSE}
+# loading necessary libraries
+library(ape)
+library(mvSLOUCH)
+library(ouch)
+library(ade4)
+library(ggplot2)
+library(cluster)
+library(mvMORPH)
+
+# reading data
+data(carni70)
+data = carni70$tab
+size = data$size
+range = data$range
+```
+
+## Question 2.1
+
+In the first step, we explore the data. *carni70* is a list of two elements. The second element represents the data.
+```{r, echo=TRUE, eval=TRUE}
+str(data)
+```
+The data frame includes 70 observations and two columns. For each observation, namend by the name of carnivora species, the first column reports the bodysize and the second column represents the geographic range.
+
+```{r, echo=FALSE, eval=TRUE, out.width='60%', fig.align = "center"}
+ggplot(data, aes(size, range)) + 
+  geom_point() +
+  ggtitle("range vs. size") +
+  theme_bw()
+```
+Plotting the data using *size* as the x-axis and *range* as the y-axis, it already becomes clear that for the *size*-variable there are some outliers with very high values. Also, there seem to be two clusters within the data. The first cluster seems to be characcterized by small *size*- and *range*-values. The second cluster seems to be defined by small *size*-values and higher *range*-values.
+
+### Distribution of variable *size*
+The following table delivers some descriptive statistics related to the distribution of the *size*-variable.
+```{r, echo=FALSE, eval=TRUE}
+knitr::kable(as.matrix(summary(data$size)))
+```
+
+```{r, echo=FALSE, eval=TRUE, out.width='70%', fig.align = "center"}
+# boxplot
+boxplot(data$size, 
+        main = "Distribution of variable 'size'",
+        ylab = "size",
+        col = "yellow")
+```
+The shape of the boxplot for the *size*-variable indicates that most of the data points are characterized by very similar *size*-values around the median of 3.2. This shows that for most of the observations, the variance related to the *size*-variable is pretty low. However, there are a few significant outliers in the data which are represented by the small circles in the plot.
+
+These outliers can be also observed in the following histogram.
+```{r, echo=FALSE, eval=TRUE, out.width='60%', fig.align = "center"}
+ggplot(data, aes(data$size)) + 
+  geom_histogram(binwidth = 5) +
+  theme_bw() +
+  ggtitle("Distribution of variable 'size'") +
+  xlab("size")
+```
+
+### Distribution of variable *range*
+
+```{r, echo=FALSE, eval=TRUE}
+knitr::kable(as.matrix(summary(data$range)))
+```
+
+```{r, echo=FALSE, eval=TRUE, out.width='70%', fig.align = "center"}
+boxplot(data$range, 
+        main = "Distribution of variable 'range'",
+        ylab = "range",
+        col = "yellow")
+```
+In contrast to the *size*-variabke, the boxplot shows clearly that the *range*-variable does not include any outliers, because the maximum value of 36 does not exceed $Q3 + IQR * 1,5 ( = 41.28)$. The following histogram also indictaes, that the spread of the data is much lower than for the *size*-variable.
+```{r, echo=FALSE, eval=TRUE, out.width='60%', fig.align = "center"}
+ggplot(data, aes(data$range)) + 
+  geom_histogram(binwidth = 1) +
+  theme_bw() +
+  ggtitle("Distribution of variable 'range'") +
+  xlab("range")
+```
+
+## Question 2.2
+
+```{r, evil}
+# creating random tree in ouch format with same size of data
+tree = rtree(n=70)
+plot(tree)
+myoutree = ape2ouch(tree)
+```
+
+# 2.2.1 Independent Brownian motions
+```{r}
+# Both traits evolve as independent Brownian motions.
+brown_size <- BrownianMotionModel(myoutree, data = size)
+brown_range <- BrownianMotionModel(myoutree, data = range)
+```
+
+# 2.2.2 Correlated Brownian  motions
+```{r}
+# The traits evolve as a correlated Brownian motion
+# usage of created random tree
+phyltree = myoutree
+# Correct the names of the internal node labels
+phyltree@nodelabels[1:(phyltree@nnodes-phyltree@nterm)]<-as.character(
+  1:(phyltree@nnodes-phyltree@nterm))
+# Correct the names of the end node labels
+phyltree@nodelabels[(phyltree@nnodes-phyltree@nterm+1):phyltree@nnodes]<-as.character(rownames(data))
+### And finally try to recover the parameters of the Brownian motion.
+correlation <- cor(data$size, data$range)
+BMestim<-BrownianMotionModel(phyltree, data, M.error = correlation)
+```
+
+# 2.2.3 Independent Ornstein-Uhlenbeck processes
+```{r}
+# Both traits evolve as independent Ornstein-Uhlenbeck processes.
+ou_size <- ouchModel(myoutree, data = size)
+ou_range <- ouchModel(myoutree, data = range)
+```
+
+# 2.2.4 Bivariate Ornstein-Uhlenbeck processes
+```{r}
+# usage of created random tree
+tree4 = tree
+# Correct the names of the end node labels
+tree4$tip.label = as.character(rownames(data))
+# fit model
+trait_OUM <- mvOU(tree4, data, model = "OUM")
+```
+
+# 2.2.5 Size evolves as Brownian Motion, range evolves as Ornstein-Uhlenbeck process
+```{r}
+# All of the internal nodes have to be uniquely named
+myoutree@nodelabels[1:(myoutree@nnodes-myoutree@nterm)] = 
+  as.character(1:(myoutree@nnodes-myoutree@nterm))
+myoutree@nodelabels[(myoutree@nnodes-myoutree@nterm+1):myoutree@nnodes] = 
+  as.character(rownames(data))
+# fit model
+brown_ou <- mvslouchModel(myoutree, data = data[,c(2,1)], kY = 1) # second column = Brownian
+```
+
+```{r}
+# comparison of the models
+# Independent Brownian motions:
+brown_size$ParamSummary$aic
+brown_range$ParamSummary$aic
+
+# Correlated Brownian motions:
+BMestim$ParamSummary$aic
+
+# Independent Ornstein-Uhlenbeck processes
+ou_size$FinalFound$ParamSummary$aic
+ou_range$FinalFound$ParamSummary$aic
+
+# Bivariate Ornstein-Uhlenbeck processes
+trait_OUM$AIC
+
+# Size evolves as Brownian Motion, range evolves as Ornstein-Uhlenbeck process
+brown_ou$FinalFound$ParamSummary$aic
+```
+In principle want the lowest values for the AIC score. For this we need to transform the AIC scores for the two independent models.
+
+```{r}
+k <- brown_size$ParamSummary$dof
+n <- nrow(data)
+aic <- (2*k) - 2*(brown_size$ParamSummary$LogLik + brown_range$ParamSummary$LogLik)
+aic_correction_numerator <- (2*(k^2) + 2*k)
+aic_correction_denominator <- (n + n) - k - k - 1
+aic_new <- aic + aic_correction_numerator/aic_correction_denominator
+```
+
+
+```{r}
+k_ou <- ou_size$FinalFound$ParamSummary$dof
+aic_ou <- (2*k) - 2*(ou_size$FinalFound$LogLik + ou_range$FinalFound$LogLik)
+aic_ou_numerator <- (2*(k_ou^2) + 2*k_ou)
+aic_ou_denominator <- (n + n) - k_ou - k_ou - 1
+ou_new <- aic_ou + aic_ou_numerator/aic_ou_denominator
+```
+
+```{r}
+# comparison of the models
+# Independent Brownian motions:
+aic_new
+
+# Correlated Brownian motions:
+BMestim$ParamSummary$aic
+
+# Independent Ornstein-Uhlenbeck processes
+ou_new
+
+# Bivariate Ornstein-Uhlenbeck processes
+trait_OUM$AIC
+
+# Size evolves as Brownian Motion, range evolves as Ornstein-Uhlenbeck process
+brown_ou$FinalFound$ParamSummary$aic
+```
+
+After transforming the AIC codes in a proper way in order to compare them. We conclude that the most suitable model is the one with the lowest AIC score. Which, in our case is when the traits evolve as two independent Ornstein-Uhlenbeck processes.
