@@ -1,0 +1,55 @@
+Relation: Airport
+FD1: airport_code —> name, country
+
+Relation: Route
+FD1: airport_arrival, airport_departure, year —> route_price 
+
+# Comment:
+In this case we only have 2 airports, therefore one could identify two additional functional dependencies:
+
+FD2: airport_departure —> airport_arrival
+FD3: airport_arrival —> airport_departure
+
+Relation: Year
+FD1: year —> profit_factor
+
+Relation: Weekday
+Only one attribute in this relation.
+
+Relation: Year_weekday
+FD1: weekday, year —> weekday_factor
+
+Relation: Weekly_schedule
+FD1: wFlight_id, year —> airport_arrival, airport_departure, dpt_time, weekday
+
+Relation: Flight
+FD1: flight_no —> wFlight_id, week
+FD2: wFlight_id, week —> flight_no
+
+Relation: Passenger
+FD1: passp_no —> first_name, last_name
+
+Relation: Contact
+FD1: passp_no —> phone_no, email
+FD2: phone_no —> passp_no
+FD3: email —> passp_no
+FD4: phone_no —> email
+FD5: email —> phone_no
+
+Relation: Reservation
+FD1: res_no —> flight_no, contact_passp_no, no_seats, passengers_added
+
+Relation: Booking
+FD1: res_no —> price, payment_card
+
+Relation: Credit Card
+FD1: card_no —> holder_name
+
+Relation: Passenger_Reservation
+We could not identify a functional dependency here. 
+A passp_no can belong to multiple res_no also,
+A res_no can belong to multiple passp_no
+
+Passenger_Ticket
+FD1: passp_no, res_no —> ticket_no
+FD2: ticket_no —> passp_no, res_no
