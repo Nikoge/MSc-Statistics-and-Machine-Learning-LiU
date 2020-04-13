@@ -1,0 +1,290 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1671\cocoasubrtf200
+{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\csgray\c0;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww14360\viewh13380\viewkind0
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs22 \cf2 \CocoaLigature0 Lab1, Alexander Karlsson (aleka769), Thijs Quast (thiqu264)\
+\
+Question 1\
+mysql> SELECT name FROM lab01.jbemployee;\
++--------------------+\
+| name               |\
++--------------------+\
+| Ross, Stanley      |\
+| Ross, Stuart       |\
+| Edwards, Peter     |\
+| Thompson, Bob      |\
+| Smythe, Carol      |\
+| Hayes, Evelyn      |\
+| Evans, Michael     |\
+| Raveen, Lemont     |\
+| James, Mary        |\
+| Williams, Judy     |\
+| Thomas, Tom        |\
+| Jones, Tim         |\
+| Bullock, J.D.      |\
+| Collins, Joanne    |\
+| Brunet, Paul C.    |\
+| Schmidt, Herman    |\
+| Iwano, Masahiro    |\
+| Smith, Paul        |\
+| Onstad, Richard    |\
+| Zugnoni, Arthur A. |\
+| Choy, Wanda        |\
+| Wallace, Maggie J. |\
+| Bailey, Chas M.    |\
+| Bono, Sonny        |\
+| Schwarz, Jason B.  |\
++--------------------+\
+25 rows in set (0,00 sec)\
+\
+Question 2\
+mysql> SELECT name FROM lab01.jbdept ORDER BY name;\
++------------------+\
+| name             |\
++------------------+\
+| Bargain          |\
+| Book             |\
+| Candy            |\
+| Children's       |\
+| Children's       |\
+| Furniture        |\
+| Giftwrap         |\
+| Jewelry          |\
+| Junior Miss      |\
+| Junior's         |\
+| Linens           |\
+| Major Appliances |\
+| Men's            |\
+| Sportswear       |\
+| Stationary       |\
+| Toys             |\
+| Women's          |\
+| Women's          |\
+| Women's          |\
++------------------+\
+19 rows in set (0,00 sec)\
+\
+Question 3\
+mysql> SELECT name FROM lab01.jbparts WHERE qoh=0;\
++-------------------+\
+| name              |\
++-------------------+\
+| card reader       |\
+| card punch        |\
+| paper tape reader |\
+| paper tape punch  |\
++-------------------+\
+4 rows in set (0,00 sec)\
+\
+Question 4\
+\
+mysql> SELECT name FROM lab01.jbemployee WHERE (salary >= 9000 AND salary <= 10000);\
++----------------+\
+| name           |\
++----------------+\
+| Edwards, Peter |\
+| Smythe, Carol  |\
+| Williams, Judy |\
+| Thomas, Tom    |\
++----------------+\
+4 rows in set (0,00 sec)\
+\
+Question 5\
+\
+mysql> SELECT name, (startyear - birthyear) AS startage FROM lab01.jbemployee ;\
++--------------------+----------+\
+| name               | startage |\
++--------------------+----------+\
+| Ross, Stanley      |       18 |\
+| Ross, Stuart       |        1 |\
+| Edwards, Peter     |       30 |\
+| Thompson, Bob      |       40 |\
+| Smythe, Carol      |       38 |\
+| Hayes, Evelyn      |       32 |\
+| Evans, Michael     |       22 |\
+| Raveen, Lemont     |       24 |\
+| James, Mary        |       49 |\
+| Williams, Judy     |       34 |\
+| Thomas, Tom        |       21 |\
+| Jones, Tim         |       20 |\
+| Bullock, J.D.      |        0 |\
+| Collins, Joanne    |       21 |\
+| Brunet, Paul C.    |       21 |\
+| Schmidt, Herman    |       20 |\
+| Iwano, Masahiro    |       26 |\
+| Smith, Paul        |       21 |\
+| Onstad, Richard    |       19 |\
+| Zugnoni, Arthur A. |       21 |\
+| Choy, Wanda        |       23 |\
+| Wallace, Maggie J. |       19 |\
+| Bailey, Chas M.    |       19 |\
+| Bono, Sonny        |       24 |\
+| Schwarz, Jason B.  |       15 |\
++--------------------+----------+\
+25 rows in set (0,00 sec)\
+\
+Question 6\
+mysql> SELECT name FROM lab01.jbemployee WHERE name LIKE '%son,%';\
++---------------+\
+| name          |\
++---------------+\
+| Thompson, Bob |\
++---------------+\
+1 row in set (0,00 sec)\
+\
+Question 7\
+SELECT name FROM lab01.jbitem AS I WHERE I.supplier IN (SELECT id FROM lab01.jbsupplier AS S WHERE S.name = 'Fisher-Price');\
++-----------------+\
+| name            |\
++-----------------+\
+| Maze            |\
+| The 'Feel' Book |\
+| Squeeze Ball    |\
++-----------------+\
+3 rows in set (0,00 sec)\
+\
+Question 8\
+\
+mysql> SELECT I.name\
+    -> FROM lab01.jbitem as I, lab01.jbsupplier as S\
+    -> WHERE I.supplier = S.id and S.name = 'Fisher-Price';\
++-----------------+\
+| name            |\
++-----------------+\
+| Maze            |\
+| The 'Feel' Book |\
+| Squeeze Ball    |\
++-----------------+\
+3 rows in set (0,00 sec)\
+\
+Question 9\
+\
+mysql> SELECT C.name FROM lab01.jbcity as C\
+    -> WHERE C.id IN (SELECT city FROM lab01.jbsupplier);\
++----------------+\
+| name           |\
++----------------+\
+| Amherst        |\
+| Boston         |\
+| New York       |\
+| White Plains   |\
+| Hickville      |\
+| Atlanta        |\
+| Madison        |\
+| Paxton         |\
+| Dallas         |\
+| Denver         |\
+| Salt Lake City |\
+| Los Angeles    |\
+| San Diego      |\
+| San Francisco  |\
+| Seattle        |\
++----------------+\
+15 rows in set (0,00 sec)\\\
+\
+Question 10\
+\
+mysql> SELECT P.name, P.color from lab01.jbparts as P where P.weight > (SELECT weight from lab01.jbparts  where name = "card reader");\
++--------------+--------+\
+| name         | color  |\
++--------------+--------+\
+| disk drive   | black  |\
+| tape drive   | black  |\
+| line printer | yellow |\
+| card punch   | gray   |\
++--------------+--------+\
+4 rows in set (0,00 sec)\
+\
+mysql> \
+\
+Question 11\
+\
+mysql> SELECT P.name, P.color\
+    -> FROM lab01.jbparts AS P, lab01.jbparts as P_copy\
+    -> where P_copy.name = 'card reader' AND P.weight > P_copy.weight;\
++--------------+--------+\
+| name         | color  |\
++--------------+--------+\
+| disk drive   | black  |\
+| tape drive   | black  |\
+| line printer | yellow |\
+| card punch   | gray   |\
++--------------+--------+\
+4 rows in set (0,00 sec)\
+\
+Question 12\
+\
+mysql> select avg(P.weight) as avg_weight from lab01.jbparts as P where P.color = 'black';\
++------------+\
+| avg_weight |\
++------------+\
+|   347.2500 |\
++------------+\
+1 row in set (0,00 sec)\
+\
+Question 13\
+mysql> SELECT SR.name, SUM(P.weight * SY.quan) AS sum_weight\
+    -> FROM lab01.jbsupplier as SR, lab01.jbsupply as SY, \
+    -> lab01.jbcity as C, lab01.jbparts as P\
+    -> where P.id = SY.part AND SR.id = SY.supplier AND \
+    -> SR.city = C.id AND C.state = 'Mass' group by SR.id;\
++--------------+------------+\
+| name         | sum_weight |\
++--------------+------------+\
+| DEC          |       3120 |\
+| Fisher-Price |    1135000 |\
++--------------+------------+\
+2 rows in set (0,00 sec)\
+\
+Question 14\
+mysql> USE lab01;\
+Reading table information for completion of table and column names\
+You can turn off this feature to get a quicker startup with -A\
+\
+Database changed\
+mysql> \
+mysql> CREATE TABLE items_copy (\
+    -> `id` INT(11) NOT NULL, \
+    -> `name` VARCHAR(20), \
+    -> `dept` INT(11) NOT NULL,\
+    -> `price` INT(11), \
+    -> `qoh` INT(10) UNSIGNED, \
+    -> `supplier` INT(11) NOT NULL,\
+    -> PRIMARY KEY (`id`),\
+    -> FOREIGN KEY (`dept`) REFERENCES lab01.jbdept(`id`),\
+    -> FOREIGN KEY (`supplier`) REFERENCES lab01.jbsupplier(`id`)\
+    -> );\
+Query OK, 0 rows affected (0,02 sec)\
+\
+\
+\
+mysql> INSERT INTO lab01.items_copy(`id`, `name`, `dept`, `price`, `qoh`, `supplier`)\
+    -> SELECT I.id, I.name, I.dept, I.price, I.qoh, I.supplier\
+    -> FROM lab01.jbitem as I\
+    -> WHERE (I.price) < (SELECT AVG(lab01.jbitem.price) FROM lab01.jbitem);\
+\
+mysql> \
+mysql> SELECT * FROM lab01.items_copy;\
++-----+-----------------+------+-------+------+----------+\
+| id  | name            | dept | price | qoh  | supplier |\
++-----+-----------------+------+-------+------+----------+\
+|  11 | Wash Cloth      |    1 |    75 |  575 |      213 |\
+|  19 | Bellbottoms     |   43 |   450 |  600 |       33 |\
+|  21 | ABC Blocks      |    1 |   198 |  405 |      125 |\
+|  23 | 1 lb Box        |   10 |   215 |  100 |       42 |\
+|  25 | 2 lb Box, Mix   |   10 |   450 |   75 |       42 |\
+|  26 | Earrings        |   14 |  1000 |   20 |      199 |\
+|  43 | Maze            |   49 |   325 |  200 |       89 |\
+| 106 | Clock Book      |   49 |   198 |  150 |      125 |\
+| 107 | The 'Feel' Book |   35 |   225 |  225 |       89 |\
+| 118 | Towels, Bath    |   26 |   250 | 1000 |      213 |\
+| 119 | Squeeze Ball    |   49 |   250 |  400 |       89 |\
+| 120 | Twin Sheet      |   26 |   800 |  750 |      213 |\
+| 165 | Jean            |   65 |   825 |  500 |       33 |\
+| 258 | Shirt           |   58 |   650 | 1200 |       33 |\
++-----+-----------------+------+-------+------+----------+\
+14 rows in set (0,00 sec)\
+}
