@@ -44,36 +44,39 @@ Developed semi-supervised learning methods that classify cells according to sing
       * Debugging and object-oriented programming.
       
       * Performance enhancement, parallel programming and many other advanced concepts.
+      
+* ## [Bayesian Learning](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Bayesian%20Learning)
 
-* ## [Database Technology](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Database%20Technology)
-   The course covers structuring and interaction of modern databases. SQL is elaborately covered in this course.
-  
-  This course covers:
-   * EER diagrams
-   
-   * SQL
-   
-   * Functional dependencies
-   
-   * Database structures
+    The course aims to give a solid introduction to the Bayesian approach to statistical inference in R, with a view towards               applications in machine learning. 
 
-* ## [Text Mining](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Text%20Mining)
-   The goal of this course is to introduce you to the main tools of the text mining trade – information retrieval, natural language processing, and text data analysis – and to enable you to independently plan, carry out, and evaluate text mining projects.
-  
-  This course covers:
-   * Use basic methods for information extraction and retrieval of textual data
-   
-   * Apply text processing techniques to prepare documents for statistical modelling
-   
-   * Apply relevant machine learning models for analyzing textual data and correctly interpret the results
-   
-   * Use machine learning models for text prediction
-   
-   * Evaluate the performance of machine learning models for textual data
-   
+    The course covers the  4 modules below:
+    
+     * Bayesics: Basic concepts about likelihood, priors, (one|multi)-parameter models, marginalization.
+     
+     * Bayesian Regression and Classification.
+     
+     * More advanced models, MCMC and Variational Bayes.
+     
+     * Model Inference and Variable Selection.
 
-
-
+* ## [Big Data Analytics](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Big%20Data%20Analytics)
+    
+    The programming language of this course is Python and database technologies are Spark and SparkSQL. The structure of the big data,       which is used in labs, can be found in the repository.This course covers the  following topics:
+    
+    * Introduction to Big Data: concept and tools.
+    
+    * Parallel computing.
+    
+    * Databases for Big Data (NoSql, HDFS).
+    
+    * Querying for Big Data (Spark, SparkSQL).
+    
+    * Resource management in a cluster environment.
+    
+    * Parallelizing computations for Big Data. MapReduce concept.
+    
+    * Machine Learning for Big Data.
+    
 * ## [Bioinformatics](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Bioinformatics)
     The course introduces basic molecular biology concepts and how to analyze data with bioinformatics and statistics.
   
@@ -91,53 +94,7 @@ Developed semi-supervised learning methods that classify cells according to sing
      * Analysis of micromatrices,
 
      * Network biology
-
-
-* ## [Time Series Analysis](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Time%20Series%20Analysis)
-   The course introduces the main concepts and tools in time series analysis. All analysis is done in R.
-  
-  This course covers:
-     * Introduction to Probability and Time Series Analysis
-     
-     * Exploratory Analysis and Time Series Regression
-     
-     * ARIMA Models
-     
-     * State Space Models
-     
-     * Deep Learning Methods: RNN
-
-* ## [Machine Learning](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Machine%20Learning)
- 
-    The course introduces main principles and methods of machine learning in R which are necessary for analysis of large or complex         data. It presents machine learning mainly from a probabilistic framework, but successful non-probabilistic methods are also             covered. 
     
-    This course covers:
-     * Basic concepts in machine learning. Software. Regression, regularization and model selection.
-     
-     * Classification methods. Dimensionality reduction and uncertainty estimation.
-     
-     * Kernel methods and support vector machines. Neural networks and deep learning.
-     
-     * Ensemble methods and mixture models. Online Learning.
-     
-     * Splines and additive models. High-dimensional problems.
- 
- 
- 
-* ## [Introduction to Python](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Introduction%20to%20Python)
-
-    The course covers Python basics and more advanced concepts such as:
-    
-     * Data structures.
-      
-     * Functions and functional programming.
-     
-     * Classes and object oriented programming.
-     
-     * Standard library and debbuging. 
-    
-
-     
 * ## [Computational Statistics](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Computational%20Statistics)
   
     The course includes computational applications of statistics in R and covers as main topics:
@@ -152,40 +109,19 @@ Developed semi-supervised learning methods that classify cells according to sing
       
      * Numerical model selection and hyphothesis testing,
       
-     * EM algorithm and stochastic optimization (specifically genetic algorithms).
-      
- * ## [Big Data Analytics](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Big%20Data%20Analytics)
-    
-    The programming language of this course is Python and database technologies are Spark and SparkSQL. The structure of the big data,       which is used in labs, can be found in the repository.This course covers the  following topics:
-    
-    * Introduction to Big Data: concept and tools.
-    
-    * Parallel computing.
-    
-    * Databases for Big Data (NoSql, HDFS).
-    
-    * Querying for Big Data (Spark, SparkSQL).
-    
-    * Resource management in a cluster environment.
-    
-    * Parallelizing computations for Big Data. MapReduce concept.
-    
-    * Machine Learning for Big Data.
+     * EM algorithm and stochastic optimization (specifically genetic algorithms).    
 
-* ## [Bayesian Learning](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Bayesian%20Learning)
-
-    The course aims to give a solid introduction to the Bayesian approach to statistical inference in R, with a view towards               applications in machine learning. 
-
-    The course covers the  4 modules below:
-    
-     * Bayesics: Basic concepts about likelihood, priors, (one|multi)-parameter models, marginalization.
-     
-     * Bayesian Regression and Classification.
-     
-     * More advanced models, MCMC and Variational Bayes.
-     
-     * Model Inference and Variable Selection.
-
+* ## [Database Technology](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Database%20Technology)
+   The course covers structuring and interaction of modern databases. SQL is elaborately covered in this course.
+  
+  This course covers:
+   * EER diagrams
+   
+   * SQL
+   
+   * Functional dependencies
+   
+   * Database structures
 
 * ## [Decision Theory](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Decision%20Theory)
 
@@ -205,6 +141,34 @@ Developed semi-supervised learning methods that classify cells according to sing
     * Graphical modelling as a tool for decision making.
     
     * Sequential analysis.
+    
+* ## [Introduction to Python](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Introduction%20to%20Python)
+
+    The course covers Python basics and more advanced concepts such as:
+    
+     * Data structures.
+      
+     * Functions and functional programming.
+     
+     * Classes and object oriented programming.
+     
+     * Standard library and debbuging. 
+
+* ## [Machine Learning](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Machine%20Learning)
+ 
+    The course introduces main principles and methods of machine learning in R which are necessary for analysis of large or complex         data. It presents machine learning mainly from a probabilistic framework, but successful non-probabilistic methods are also             covered. 
+    
+    This course covers:
+     * Basic concepts in machine learning. Software. Regression, regularization and model selection.
+     
+     * Classification methods. Dimensionality reduction and uncertainty estimation.
+     
+     * Kernel methods and support vector machines. Neural networks and deep learning.
+     
+     * Ensemble methods and mixture models. Online Learning.
+     
+     * Splines and additive models. High-dimensional problems.
+
 
 * ## [Statistical Methods](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Statistical%20Methods)
 
@@ -220,3 +184,31 @@ Developed semi-supervised learning methods that classify cells according to sing
   
   * Regression analysis and sampling.
 
+* ## [Text Mining](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Text%20Mining)
+   The goal of this course is to introduce you to the main tools of the text mining trade – information retrieval, natural language processing, and text data analysis – and to enable you to independently plan, carry out, and evaluate text mining projects.
+  
+  This course covers:
+   * Use basic methods for information extraction and retrieval of textual data
+   
+   * Apply text processing techniques to prepare documents for statistical modelling
+   
+   * Apply relevant machine learning models for analyzing textual data and correctly interpret the results
+   
+   * Use machine learning models for text prediction
+   
+   * Evaluate the performance of machine learning models for textual data
+   
+* ## [Time Series Analysis](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Time%20Series%20Analysis)
+   The course introduces the main concepts and tools in time series analysis. All analysis is done in R.
+  
+  This course covers:
+     * Introduction to Probability and Time Series Analysis
+     
+     * Exploratory Analysis and Time Series Regression
+     
+     * ARIMA Models
+     
+     * State Space Models
+     
+     * Deep Learning Methods: RNN
+     
