@@ -10,6 +10,16 @@ Developed semi-supervised learning methods that classify cells according to sing
 
 #### All the laboratory work I did for the master studies in Statistics and Machine Learning can be found In this repository.
 
+* ## [Time Series Analysis](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Time%20Series%20Analysis)
+The course introduces the main concepts and tools in time series analysis. All analysis is done in R.
+
+   This course covers:
+    * Introduction to Probability and Time Series Analysis
+    * Exploratory Analysis and Time Series Regression
+    * ARIMA Models
+    * State Space Models
+    * Deep Learning Methods: RNN
+
 * ## [Machine Learning](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Machine%20Learning)
  
     The course introduces main principles and methods of machine learning in R which are necessary for analysis of large or complex         data. It presents machine learning mainly from a probabilistic framework, but successful non-probabilistic methods are also             covered. 
