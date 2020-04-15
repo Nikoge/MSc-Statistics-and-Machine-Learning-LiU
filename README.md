@@ -5,10 +5,46 @@ Overview of my work during the MSc Statistics and Machine Learning at Linköping
 ### MSc thesis: semi-supervised learning for cell type identification
 Developed semi-supervised learning methods that classify cells according to single cell RNA-sequence data.
 
+     
+* ## [Advanced Data mining](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Advanced%20Data%20Mining)
+    
+    All labs at this course are done with Weka v3.6.12 and reports focus on comparison of algorithms and choosing parameter. Additionally,       Apriori, FP-grow algorithms; K-Means, K-medoids, PAM clustering, CLARA, CLARANS, BIRCH algorithms are being studied and run step by step.
 
-# Statistics-and-Machine-Learning
+    This course covers the following content:
+    
+     * Clustering | Partitioning Methods: K-Means, K-Medoids, PAM, CLARA, CLARANS.
+      
+     * Clustering | Hierarchical Methods: AGNES, DIANA; BIRCH, ROCK, CHAMELEON.
+      
+     * Clustering | Density-Based Methods: DBSCAN, OPTICS, Denclue.
+      
+     * Association Analysis: Apriori algorithm, FP-grow Algorithm, Monotone/Antimonotone Constraints.
 
-#### All the laboratory work I did for the master studies in Statistics and Machine Learning can be found In this repository.
+
+* ## [Advanced Machine Learning](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Advanced%20Machine%20Learning)
+  
+  The course covers advanced topics in machine learning, primarily from Bayesian perspective in R.The course includes laboratory works   in which students get a practical experience of data analysis. 
+  A major part of the course is devoted to  Graphical models, such as
+  
+   * Hidden Markov Models.
+   
+   * Bayesian networks.
+   
+   * Markov random fields and other methods. 
+   
+ * ## [Advanced programming in R](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Advanced%20Programming%20in%20R)
+ 
+    The course is devoted to studying the programming language R, including its standard and more advanced tools. 
+    
+    It covers concepts such as:
+      * Reading data from file and from the internet.
+      
+      * Data structures, functions and objects.
+      
+      * Debugging and object-oriented programming.
+      
+      * Performance enhancement, parallel programming and many other advanced concepts.
+
 * ## [Database Technology](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Database%20Technology)
    The course covers structuring and interaction of modern databases. SQL is elaborately covered in this course.
   
@@ -86,18 +122,7 @@ Developed semi-supervised learning methods that classify cells according to sing
      
      * Splines and additive models. High-dimensional problems.
  
- * ## [Advanced R programming](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Advanced%20Programming%20in%20R)
  
-    The course is devoted to studying the programming language R, including its standard and more advanced tools. 
-    
-    It covers concepts such as:
-      * Reading data from file and from the internet.
-      
-      * Data structures, functions and objects.
-      
-      * Debugging and object-oriented programming.
-      
-      * Performance enhancement, parallel programming and many other advanced concepts.
  
 * ## [Introduction to Python](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Introduction%20to%20Python)
 
@@ -111,20 +136,7 @@ Developed semi-supervised learning methods that classify cells according to sing
      
      * Standard library and debbuging. 
     
-     
-* ## [Advanced Data mining](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Advanced%20Data%20Mining)
-    
-    All labs at this course are done with Weka v3.6.12 and reports focus on comparison of algorithms and choosing parameter. Additionally,       Apriori, FP-grow algorithms; K-Means, K-medoids, PAM clustering, CLARA, CLARANS, BIRCH algorithms are being studied and run step by step.
 
-    This course covers the following content:
-    
-     * Clustering | Partitioning Methods: K-Means, K-Medoids, PAM, CLARA, CLARANS.
-      
-     * Clustering | Hierarchical Methods: AGNES, DIANA; BIRCH, ROCK, CHAMELEON.
-      
-     * Clustering | Density-Based Methods: DBSCAN, OPTICS, Denclue.
-      
-     * Association Analysis: Apriori algorithm, FP-grow Algorithm, Monotone/Antimonotone Constraints.
      
 * ## [Computational Statistics](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Computational%20Statistics)
   
@@ -174,16 +186,6 @@ Developed semi-supervised learning methods that classify cells according to sing
      
      * Model Inference and Variable Selection.
 
-* ## [Advanced Machine Learning](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Advanced%20Machine%20Learning)
-  
-  The course covers advanced topics in machine learning, primarily from Bayesian perspective in R.The course includes laboratory works   in which students get a practical experience of data analysis. 
-  A major part of the course is devoted to  Graphical models, such as
-  
-   * Hidden Markov Models.
-   
-   * Bayesian networks.
-   
-   * Markov random fields and other methods. 
 
 * ## [Decision Theory](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Decision%20Theory)
 
