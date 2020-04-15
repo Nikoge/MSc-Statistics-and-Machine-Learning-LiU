@@ -15,9 +15,13 @@ The course introduces the main concepts and tools in time series analysis. All a
 
    This course covers:
     * Introduction to Probability and Time Series Analysis
+    
     * Exploratory Analysis and Time Series Regression
+    
     * ARIMA Models
+    
     * State Space Models
+    
     * Deep Learning Methods: RNN
 
 * ## [Machine Learning](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Machine%20Learning)
