@@ -9,6 +9,34 @@ Developed semi-supervised learning methods that classify cells according to sing
 # Statistics-and-Machine-Learning
 
 #### All the laboratory work I did for the master studies in Statistics and Machine Learning can be found In this repository.
+* ## [Database Technology](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Database%20Technology)
+   The course covers structuring and interaction of modern databases. SQL is elaborately covered in this course.
+  
+  This course covers:
+   * EER diagrams
+   
+   * SQL
+   
+   * Functional dependencies
+   
+   * Database structures
+
+* ## [Text Mining](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Text%20Mining)
+   The goal of this course is to introduce you to the main tools of the text mining trade – information retrieval, natural language processing, and text data analysis – and to enable you to independently plan, carry out, and evaluate text mining projects.
+  
+  This course covers:
+   * Use basic methods for information extraction and retrieval of textual data
+   
+   * Apply text processing techniques to prepare documents for statistical modelling
+   
+   * Apply relevant machine learning models for analyzing textual data and correctly interpret the results
+   
+   * Use machine learning models for text prediction
+   
+   * Evaluate the performance of machine learning models for textual data
+   
+
+
 
 * ## [Bioinformatics](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Bioinformatics)
     The course introduces basic molecular biology concepts and how to analyze data with bioinformatics and statistics.
