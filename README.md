@@ -10,6 +10,25 @@ Developed semi-supervised learning methods that classify cells according to sing
 
 #### All the laboratory work I did for the master studies in Statistics and Machine Learning can be found In this repository.
 
+* ## [Bioinformatics](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Bioinformatics)
+    The course introduces basic molecular biology concepts and how to analyze data with bioinformatics and statistics.
+  
+  This course covers:
+     * Basics of molecular biology and genetics,
+
+     * Hidden Markov chains, genetic sequence analysis,
+
+     * Sequence similarity, sequence grouping,
+
+     * Reconstruction of phylogeny,
+
+     * Quantitative tensile modeling,
+
+     * Analysis of micromatrices,
+
+     * Network biology
+
+
 * ## [Time Series Analysis](https://github.com/Thijsq/MSc-Statistics-and-Machine-Learning-LiU/tree/master/Time%20Series%20Analysis)
    The course introduces the main concepts and tools in time series analysis. All analysis is done in R.
   
